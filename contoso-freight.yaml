@@ -1,0 +1,72 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: contoso-freight-back
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: contoso-freight-back
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: contoso-freight-back
+        image: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: contoso-freight-back
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: contoso-freight-back
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: contoso-freight-front
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: contoso-freight-front
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: contoso-freight-front
+        image: suvetrivtest.azurecr.io/contoso-freight:v1
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+        env:
+        - name: REDIS
+          value: "contoso-freight-back"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: contoso-freight-front
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: contoso-freight-front
