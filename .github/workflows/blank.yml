@@ -13,7 +13,7 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
     - run: |
-        docker build . -n contoso-freight -p 8080:80
+        docker build . -t contoso-freight
         docker tag contoso-freight suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
         docker push suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
       
