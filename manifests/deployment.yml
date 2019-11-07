@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: contosofreight 
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: contosofreight 
+    spec:
+      containers:
+        - name: contosofreight 
+          image: suvetrivtest.azurecr.io/contosofreight
+          ports:
+          - containerPort: 80
