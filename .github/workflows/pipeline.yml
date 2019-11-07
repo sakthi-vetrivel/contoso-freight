@@ -1,41 +1,41 @@
-on: [push]
+# on: [push]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@master
     
-    - uses: azure/container-actions/docker-login@master
-      with:
-        login-server: suvetrivtest.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+#     - uses: azure/container-actions/docker-login@master
+#       with:
+#         login-server: suvetrivtest.azurecr.io
+#         username: ${{ secrets.REGISTRY_USERNAME }}
+#         password: ${{ secrets.REGISTRY_PASSWORD }}
     
-    - run: |
-        docker build . -t contoso-freight
-        docker tag contoso-freight suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
-        docker push suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
+#     - run: |
+#         docker build . -t contoso-freight
+#         docker tag contoso-freight suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
+#         docker push suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
       
-    # Set the target AKS cluster. 
-    - uses: azure/k8s-actions/aks-set-context@master
-      with:
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
-        cluster-name: contoso
-        resource-group: contoso-rg
+#     # Set the target AKS cluster. 
+#     - uses: azure/k8s-actions/aks-set-context@master
+#       with:
+#         creds: '${{ secrets.AZURE_CREDENTIALS }}'
+#         cluster-name: contoso
+#         resource-group: contoso-rg
         
-    - uses: azure/k8s-actions/k8s-create-secret@master
-      with:
-        container-registry-url: suvetrivtest.azurecr.io
-        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: demo-k8s-secret
+#     - uses: azure/k8s-actions/k8s-create-secret@master
+#       with:
+#         container-registry-url: suvetrivtest.azurecr.io
+#         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+#         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+#         secret-name: demo-k8s-secret
 
-    - uses: azure/k8s-actions/k8s-deploy@master
-      with:
-        manifests: |
-          contoso-freight.yaml
-        images: |
-          suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
-        imagepullsecrets: |
-          demo-k8s-secret
+#     - uses: azure/k8s-actions/k8s-deploy@master
+#       with:
+#         manifests: |
+#           contoso-freight.yaml
+#         images: |
+#           suvetrivtest.azurecr.io/contoso-freight:${{ github.sha }}
+#         imagepullsecrets: |
+#           demo-k8s-secret
